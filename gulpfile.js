@@ -1,20 +1,51 @@
-// Include gulp
-var gulp = require('gulp');
+// -------------------------------------------------------------------------------------------------
+// Requirements
+// -------------------------------------------------------------------------------------------------
 
-// Include Our Plugins
-var sass = require('gulp-sass');
-var minifyCSS = require('gulp-minify-css');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var rename = require('gulp-rename');
+var gulp         = require('gulp');
+
+var runSequence  = require('run-sequence');
+var del          = require('del');
+var sass         = require('gulp-sass');
 var autoprefixer = require('gulp-autoprefixer');
-var sourcemaps = require('gulp-sourcemaps');
-var notify = require('gulp-notify');
-var plumber = require('gulp-plumber');
-var iconfont = require('gulp-iconfont');
-var consolidate = require('gulp-consolidate');
-var browserSync = require('browser-sync');
-var changed = require('gulp-changed');
+var concat       = require('gulp-concat');
+var sourcemaps   = require('gulp-sourcemaps');
+var notify       = require('gulp-notify');
+var plumber      = require('gulp-plumber');
+var browserSync  = require('browser-sync');
+var changed      = require('gulp-changed');
+var minifyCSS    = require('gulp-minify-css');
+var minifyHTML   = require('gulp-minify-html');
+var uglify       = require('gulp-uglify');
+
+
+// -------------------------------------------------------------------------------------------------
+// Config
+// -------------------------------------------------------------------------------------------------
+
+var basePath = {
+	src: 'src/',
+	dest: 'build/'
+};
+
+var src = {
+	coffee : basePath.src + 'coffee/',
+	fonts  : basePath.src + 'fonts/',
+	ie     : basePath.src + 'ie8/',
+	img    : basePath.src + 'img/',
+	js     : basePath.src + 'js/',
+	pages  : basePath.src + 'pages/',
+	sass   : basePath.src + 'sass/'
+}
+
+var dest = {
+	fonts  : basePath.dest + 'fonts/',
+	ie     : basePath.dest + 'ie8/',
+	img    : basePath.dest + 'img/',
+	js     : basePath.dest + 'js/',
+	pages  : basePath.dest,
+	css   : basePath.dest + 'css/'
+}
 
 var reload = browserSync.reload;
 var onError = function(err) {
@@ -22,121 +53,91 @@ var onError = function(err) {
 	this.emit('end');
 };
 
-// BrowserSync
-gulp.task('browser-sync', function() {
-	browserSync.init({
-		host: "192.168.1.50",
-		xip: true,
-		server: {
-			index: "index.html"
-		}
-	});
 
-	gulp.watch('./sass/{,**/}*.scss', ['sass']);
-	gulp.watch('js/plugins/*', ['plugins']);
-	gulp.watch(['js/vendors/*', 'js/plugins.concat.js', 'js/order/*', 'js/main/*', 'js/global/*'], ['scripts']);
-	gulp.watch('./img/icons/*.svg', ['icon-generate']);
-	gulp.watch('./*.html').on('change', reload);
+// -------------------------------------------------------------------------------------------------
+// Sub tasks
+// -------------------------------------------------------------------------------------------------
+
+gulp.task('clean', function() {
+  del(basePath.dest);
 });
 
-// Compile Our SASS
+gulp.task('move', function() {
+	['fonts', 'ie', 'img'].forEach(function(type){
+		gulp.src(src[type] + '**/*').pipe(gulp.dest(dest[type]));
+	})
+	return gulp.src(src.js + 'vendors/modernizr-2.6.2-respond-1.1.0.min.js').pipe(gulp.dest(dest.js));
+})
+
+gulp.task('html', function() {
+	return gulp.src(src.pages + '*').pipe(gulp.dest(dest.pages));
+})
+
 gulp.task('sass', function() {
-	return gulp.src('./sass/*.scss')
-		.pipe(plumber({
-			errorHandler: onError
-		}))
-		.pipe(changed('./css'))
+	return gulp.src(src.sass + '*.scss')
+		.pipe(plumber({ errorHandler: onError }))
+		.pipe(changed(dest.css))
 		.pipe(sourcemaps.init())
 		.pipe(sass({
-			errLogToConsole: true
+			errLogToConsole: true,
+			includePaths: ['bower_components']
 		}))
 		.pipe(autoprefixer({
 			browsers: ['last 3 versions'],
 			cascade: false
 		}))
 		.pipe(sourcemaps.write())
-		.pipe(gulp.dest('./css'))
+		.pipe(gulp.dest(dest.css))
 		.pipe(notify("sass compiled, look at your styles"))
 		.pipe(browserSync.stream());
 });
 
-// Minify CSS
-gulp.task('sass-build', function() {
-	return gulp.src('./sass/*.scss')
-		.pipe(sass())
-		.pipe(minifyCSS())
-		.pipe(gulp.dest('./css'))
-		.pipe(notify("sass-build completed"));
-});
-
-// Concat Plugins
-gulp.task('plugins', function() {
-	return gulp.src('js/plugins/*')
-		.pipe(concat('plugins.concat.js'))
-		.pipe(gulp.dest('./js/'))
-		.pipe(notify("plugins done"));
-});
-
-// Concat Main JS
-gulp.task('scripts', ['plugins'], function() {
+gulp.task('scripts', function() {
 	return gulp.src([
-			'js/vendors/jquery-1.11.1.min.js',
-			'js/order/before_plugins.js',
-			'js/plugins.concat.js',
-			'js/global/*',
-			'js/order/init.js',
-			'js/order/common.js',
-			'js/main/*'
+			src.js + 'vendors/jquery-1.11.1.min.js',
+		  src.js + 'plugins/*',
+			src.js + 'global/*',
+			src.js + 'main/init.js',
+			src.js + 'main/index.js'
 		])
-		.pipe(concat('main.concat.js'))
-		.pipe(plumber({
-			errorHandler: onError
-		}))
-		.pipe(gulp.dest('./js/'))
-		.pipe(rename('main.min.js'))
-		.pipe(uglify())
-		.pipe(gulp.dest('./js/'))
+		.pipe(concat('main.js'))
+		.pipe(plumber({ errorHandler: onError }))
+		.pipe(gulp.dest(dest.js))
 		.pipe(notify("[ main scripts ] are ready, rock on!"));
 });
 
-// Generate iconfont
-gulp.task('icon-generate', function() {
-	var fontName = 'icon';
+gulp.task('browser-sync', function() {
+	browserSync.init({
+		host: "192.168.1.50",
+		xip: true,
+		server: {
+			baseDir: basePath.dest,
+			index: 'index.html'
+		}
+	});
 
-	return gulp.src('img/icons/*.svg')
-		.pipe(iconfont({
-			fontName: fontName,
-			normalize: true,
-			fontHeight: 1001
-		}))
-		.on('glyphs', function(glyphs, options) {
-			var font_options = {
-				className: fontName,
-				fontName: fontName,
-				fontPath: '../fonts/',
-				glyphs: glyphs,
-			};
+	gulp.watch(src.sass +'**/*.scss', ['sass']);
+	gulp.watch(src.js + '**/*.js', function() { runSequence('scripts', reload) });
+	gulp.watch(src.pages + '**/*.html', function() { runSequence('html', reload) });
+})
 
-			// CSS
-			gulp.src('img/icons/template.css')
-				.pipe(consolidate('lodash', font_options))
-				.pipe(rename({
-					basename: fontName
-				}))
-				.pipe(gulp.dest('css'));
-
-			// HTML
-			gulp.src('img/icons/template.html')
-				.pipe(consolidate('lodash', font_options))
-				.pipe(rename({
-					basename: 'icon-sample'
-				}))
-				.pipe(gulp.dest('css'));
-		})
-		.pipe(gulp.dest('fonts'));
+gulp.task('minify', function() {
+  gulp.src(dest.css + '*.css').pipe(minifyCSS()).pipe(gulp.dest(dest.css))
+  gulp.src(dest.js + '*.js').pipe(uglify()).pipe(gulp.dest(dest.js))
+  gulp.src(dest.pages + '*.html').pipe(minifyHTML()).pipe(gulp.dest(dest.pages))
 });
 
 
-// Tasks
-gulp.task('default', ['browser-sync']);
-gulp.task('build', ['sass-build', 'plugins', 'scripts', 'icon-generate']);
+// -------------------------------------------------------------------------------------------------
+// Main task
+// -------------------------------------------------------------------------------------------------
+
+gulp.task('compile', ['move', 'html', 'sass', 'scripts']);
+
+gulp.task('default', function(){
+	runSequence('clean', 'compile', 'browser-sync');
+});
+
+gulp.task('build', function() {
+	runSequence('clean', 'compile', 'minify');
+});

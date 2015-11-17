@@ -16,5 +16,10 @@
     "gulp-notify": "latest",
     "browser-sync": "latest",
     "gulp-mustache-plus": "latest"
+  },
+  "dependencies": {
+    "del": "^2.1.0",
+    "gulp-minify-html": "^1.0.4",
+    "run-sequence": "^1.1.4"
   }
 }

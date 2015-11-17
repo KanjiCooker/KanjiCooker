@@ -628,7 +628,6 @@ if ("document" in self) {
   };
 });
 
-
 $(function() {
 	$('.menu--about__contents').eq(0).addClass('active');
 });
