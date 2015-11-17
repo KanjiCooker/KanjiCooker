@@ -8,6 +8,7 @@ var runSequence  = require('run-sequence');
 var del          = require('del');
 var sass         = require('gulp-sass');
 var autoprefixer = require('gulp-autoprefixer');
+var coffeeify    = require('gulp-coffeeify');
 var concat       = require('gulp-concat');
 var sourcemaps   = require('gulp-sourcemaps');
 var notify       = require('gulp-notify');
@@ -29,7 +30,6 @@ var basePath = {
 };
 
 var src = {
-	coffee : basePath.src + 'coffee/',
 	fonts  : basePath.src + 'fonts/',
 	ie     : basePath.src + 'ie8/',
 	img    : basePath.src + 'img/',
@@ -93,18 +93,15 @@ gulp.task('sass', function() {
 });
 
 gulp.task('scripts', function() {
-	return gulp.src([
-			src.js + 'vendors/jquery-1.11.1.min.js',
-		  src.js + 'plugins/*',
-			src.js + 'global/*',
-			src.js + 'main/init.js',
-			src.js + 'main/index.js'
-		])
-		.pipe(concat('main.js'))
-		.pipe(plumber({ errorHandler: onError }))
-		.pipe(gulp.dest(dest.js))
-		.pipe(notify("[ main scripts ] are ready, rock on!"));
-});
+	return gulp.src(src.js + 'main.coffee')
+    .pipe(coffeeify({
+      options: {
+        debug: true,
+        paths: [__dirname + '/node_modules', __dirname + '/src/js']
+      }
+    }))
+    .pipe(gulp.dest(dest.js));
+})
 
 gulp.task('browser-sync', function() {
 	browserSync.init({
@@ -117,7 +114,7 @@ gulp.task('browser-sync', function() {
 	});
 
 	gulp.watch(src.sass +'**/*.scss', ['sass']);
-	gulp.watch(src.js + '**/*.js', function() { runSequence('scripts', reload) });
+	gulp.watch(src.js + '**/*.{coffee,js}', function() { runSequence('scripts', reload) });
 	gulp.watch(src.pages + '**/*.html', function() { runSequence('html', reload) });
 })
 

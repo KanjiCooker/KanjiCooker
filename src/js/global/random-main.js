@@ -21,7 +21,7 @@ $('body').on('click', '.header--rating .level-beginner', function() {
 		wordConstructionArray.length = 2;
 		wordStrokeEndingArray.length = 5;
 		wordContrastArray.length = 6;
-		
+
 		//console.log(wordGravityArray);
 
 		$('.type-selection__body li').removeClass('show');
@@ -66,9 +66,9 @@ $('body').on('click', '.header--rating .level-class', function() {
 		wordContrastArray.length = 6;
 		wordContrastArray.length = 7;
 		wordContrastArray.push('些微反轉對比。');
-		
+
 		wordApplicationArray.length = 8;
-		
+
 		//console.log(wordGravityArray);
 
 		$('.type-selection__body li').addClass('show');
@@ -175,7 +175,7 @@ $('body').on('click', '.header--rating .level-expert', function() {
 		wordSpecialArray.push('飛白設計。','弧線轉換成八角形。','連字設計。','模板字。');
 
 		//console.log(wordGravityArray);
-		
+
 		$('.type-selection__body li').addClass('show');
 		$('.current-level').text('專家級');
 	});
@@ -218,3 +218,5 @@ function randomText() {
 	var special_rand = wordSpecialArray[Math.floor(Math.random() * wordSpecialArray.length)];
 	$('[data-type="word-special"] .content h3').text(special_rand);
 }
+
+module.exports = randomText;

@@ -1,3 +1,5 @@
+var randomText = require('global/random-main');
+
 if($body.is('.index'))
 {
 	function printout() {
