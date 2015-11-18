@@ -8,6 +8,19 @@
 		@include breakpoint(below-tablet) {
 			min-height: 60vh;
 		}
+		&[data-level='basic'] {
+			.level-beginner { @extend %inline--middle; }
+		}
+		&[data-level='normal'] {
+			.level-beginner, .level-normal { @extend %inline--middle; }
+		}
+		&[data-level='class'] {
+			.level-beginner, .level-normal, .level-class { @extend %inline--middle; }
+		}
+		&[data-level='advanced'], &[data-level='pro'] {
+			li { @extend %inline--middle; }
+		}
+
 		li {
 			display: none;
 			margin-bottom: 2px;
@@ -29,9 +42,6 @@
 						font-size: 24px;
 					}
 				}
-			}
-			&.show {
-				@extend %inline--middle;
 			}
 			.title,
 			.content {

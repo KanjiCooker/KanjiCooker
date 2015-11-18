@@ -58,15 +58,13 @@ header {
 		li {
 			@extend %inline--middle;
 			cursor: pointer;
-			&.random--color {
-				i {
-					color: #6200EA;
-				}
+			color: $gray;
+			&.active ~ li {
+				color: $gray !important;
 			}
 		}
 		i {
 			font-size: 40px;
-			color: $gray;
 		}
 		.current-level {
 			color: #6200EA;
