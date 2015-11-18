@@ -1,17 +1,5 @@
-recipes      = require('../config').recipes
-assign       = require 'lodash/object/assign'
-partialRight = require 'lodash/function/partialRight'
+{ recipes, colors, idioms, ipsums } = require('../config')
 sample       = require 'lodash/collection/sample'
-
-defaults = partialRight(assign, (current, existed) ->
-  current && existed.concat(current) || existed
-)
-
-for recipe, i in recipes
-  continue if i == 0
-  prevOptions = recipes[i-1].options
-  currentOptions = recipe.options
-  recipe.options = defaults(currentOptions, prevOptions)
 
 currentLevel = recipes[0]
 
@@ -48,7 +36,23 @@ $headerRating.find('.level-expert').on 'click', ->
   $('.type-selection__body li').addClass('show');
   updateLabel '專家級'
 
-module.exports = ->
+# --------------------------------------
+
+randomColor = ->
+  color = palette.get(sample(colors), '500')
+  $('.random--color').css
+    'color': color
+    'border-bottom-color': color
+  $('.random--background').css
+    backgroundColor: color
+
+randomIdioms = ->
+  $('.drop--type-selection-footer .content h3').text sample(idioms)
+
+randomSpecial = ->
+  $('.drop--type-selection-footer .content h3').text sample(ipsums)
+
+randomText = ->
   { width, weight, construction, strokeEnding, stem, letterRange, central, gravity, contrast, application, intendedSize, special } = currentLevel.options
   $('[data-type="word-width"] .content h3').text(sample(width))
   $('[data-type="word-weight"] .content h3').text(sample(weight))
@@ -62,3 +66,9 @@ module.exports = ->
   $('[data-type="word-application"] .content h3').text(sample(application))
   $('[data-type="word-intended-size"] .content h3').text(sample(intendedSize))
   $('[data-type="word-special"] .content h3').text(sample(special))
+
+regenerate = ->
+  randomText()
+  randomColor()
+
+module.exports = {randomColor, randomIdioms, randomSpecial, randomText, regenerate}

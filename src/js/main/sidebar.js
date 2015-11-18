@@ -4,15 +4,6 @@ $('body').on('click', '.title', function() {
 	$(this).parent().find('.sidebar--description').addClass('show');
 });
 
-$('body').on('click', '#language-select', function() {
-	if(!$(this).hasClass('open')) { 
-		closeMenu();
-		$('.sidebar--language').addClass('open');
-	} else {
-		closeMenu();
-	}
-});
-
 $('body').on('click', function() {
 	if (!$(event.target).closest('.sidebar--description, .type-selection__body .title').length) {
 		closeSideDescription();

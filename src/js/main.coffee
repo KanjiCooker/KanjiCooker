@@ -6,7 +6,10 @@ window.$         = require 'jquery'
 window.$body     = $('body')
 window.classList = require 'plugins/classList'
 window.palette   = require 'plugins/palette'
+window.printout  = -> if !window.print then alert('列印功能暫時停用，請按 Ctrl-P 來列印') else window.print()
+window.xx = (t) -> console.info(t)
 
 require 'main/menu'
 require 'main/sidebar'
 require 'main/index'
+require 'partial/type-generator'
