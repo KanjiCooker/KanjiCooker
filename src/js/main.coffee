@@ -7,6 +7,6 @@ window.$body     = $('body')
 window.classList = require 'plugins/classList'
 window.palette   = require 'plugins/palette'
 
-require 'global/menu'
-require 'global/sidebar'
+require 'main/menu'
+require 'main/sidebar'
 require 'main/index'
