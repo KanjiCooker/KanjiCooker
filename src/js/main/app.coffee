@@ -1,9 +1,11 @@
-sample    = require 'lodash/collection/sample'
+palette   = require 'plugins/palette'
 mapValues = require 'lodash/object/mapValues'
 Ui        = require './ui'
 Updater   = require './updater'
 
 initLevel = 0
+
+sample = (array) -> array[Math.floor(Math.random() * array.length)]
 
 class App
   constructor: ->
@@ -18,13 +20,8 @@ class App
     @updater.updateRecipe()
 
   generateRandomString: (type) ->
-    switch type
-      when 'ipsum'
-        @ipsum  = sample(config.ipsums)
-        @updater.updateIpsum()
-      when 'idiom'
-        @idiom  = sample(config.idioms)
-        @updater.updateIdiom()
+    @[type] = sample(config["#{type}s"])
+    @updater.updateString(type)
 
   switchLevel: (@currentLevelIndex) ->
     @currentLevel = @levels[@currentLevelIndex]

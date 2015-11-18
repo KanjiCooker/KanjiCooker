@@ -5,7 +5,7 @@ module.exports = class Updater
     { @levelLabels } = config
     @levelSwitch     = $('.header--rating li')
     @currentLevelEl  = $('.current-level')
-    @randomColorEl   = $('.random--color').add(@levelSwitch)
+    @randomColorEl   = $('.random--color')
     @randomBgColorEl = $('.random--background')
     @randomStringEl  = $('.drop--type-selection-footer .content h3')
 
@@ -29,5 +29,4 @@ module.exports = class Updater
       kebab = kebabCase(attribute)
       $("[data-type='word-#{kebab}'] .content h3").text(@app.recipe[attribute] + '。')
 
-  updateIdiom: -> @randomStringEl.text @app.idiom
-  updateIpsum: -> @randomStringEl.text @app.ipsum
+  updateString: (type) -> @randomStringEl.text @app[type]

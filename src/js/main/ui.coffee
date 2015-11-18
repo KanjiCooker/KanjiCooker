@@ -1,9 +1,5 @@
 module.exports = class Ui
   constructor: (@app) ->
-    @pickupControls()
-    @bindEvents()
-
-  pickupControls: ->
     @levelSwitch      = $('.header--rating li')
     @reloadBtn        = $('.btn--reload-type')
 
@@ -15,6 +11,8 @@ module.exports = class Ui
     @titles       = $('.title')
     @side         = $('.sidebar--description')
     @closeSideBtn = @side.find('.btn--close')
+
+    @bindEvents()
 
   bindEvents: ->
     @levelSwitch.on 'click', (e) => @app.switchLevel $(e.currentTarget).index()
