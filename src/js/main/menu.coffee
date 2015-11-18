@@ -13,9 +13,9 @@ menu = class Menu
     @languageSelect.on 'click', => @menuLanguage.toggleClass('open')
     @triggerAbout.on 'click', => @menuAbout.toggleClass('open')
     @closeBtn.on 'click', => @menuMain.removeClass('open')
-    @menuAboutArrows.on 'click', @clickHandler
+    @menuAboutArrows.on 'click', @switchPage
 
-  clickHandler: (e) =>
+  switchPage: (e) =>
     @currentPageIndex += if e.currentTarget.getAttribute('data-type') == 'next' then 1 else -1
     @menuAboutContent.removeClass('active').eq(@currentPageIndex).addClass('active')
 
