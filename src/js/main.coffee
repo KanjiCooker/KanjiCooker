@@ -7,3 +7,7 @@ window.xx = (t) -> console.info(t)
 
 require 'main/app'
 require 'main/menu'
+
+# to fix webfont dynamic loading issue
+str = JSON.stringify(config.recipes).replace(/([{}":\[\],\w])/g, '').replace(/(.)(?=.*\1)/g, '')
+$('<span />').text(str).appendTo($body)
