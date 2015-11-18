@@ -22,7 +22,7 @@ header {
 	float: left;
 	background-color: #6200EA;
 	@include breakpoint(below-tablet) {
-		@include calc(width, "100vw - 183px");
+		@include calc(width, "100vw - 180px");
 	}
 	a {
 		@extend %full-height;
@@ -72,13 +72,15 @@ header {
 	}
 	&--button-section {
 		@extend %full-height;
+		width: 180px;
 		float: right;
 		i, span {
 			@extend %color--white;
 		}
 		button {
 			@extend %full-height;
-			padding: 0 30px;
+			width: 90px;
+			text-align: center;
 			i {
 				font-size: 30px;
 				display: block;
