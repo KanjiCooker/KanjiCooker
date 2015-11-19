@@ -79,6 +79,7 @@ header {
 		}
 		button {
 			@extend %full-height;
+			float: right;
 			width: 90px;
 			text-align: center;
 			i {
