@@ -6,6 +6,7 @@ var gulp         = require('gulp');
 
 var runSequence  = require('run-sequence');
 var del          = require('del');
+var env          = require('gulp-env');
 var sass         = require('gulp-sass');
 var autoprefixer = require('gulp-autoprefixer');
 var coffeeify    = require('gulp-coffeeify');
@@ -23,6 +24,10 @@ var uglify       = require('gulp-uglify');
 // -------------------------------------------------------------------------------------------------
 // Config
 // -------------------------------------------------------------------------------------------------
+
+env({
+	file: ".env.json"
+});
 
 var basePath = {
 	src: 'src/',
@@ -74,7 +79,9 @@ gulp.task('html', function() {
 })
 
 gulp.task('sass', function() {
-	return gulp.src(src.sass + '*.scss')
+
+	var makeDevCss = function() {
+		return gulp.src(src.sass + '*.scss')
 		.pipe(plumber({ errorHandler: onError }))
 		.pipe(changed(dest.css))
 		.pipe(sourcemaps.init())
@@ -83,13 +90,32 @@ gulp.task('sass', function() {
 			includePaths: ['bower_components']
 		}))
 		.pipe(autoprefixer({
-			browsers: ['last 3 versions'],
-			cascade: false
+			browsers: JSON.parse(process.env.AUTOPREFIXER_BROWSERS)
 		}))
 		.pipe(sourcemaps.write())
 		.pipe(gulp.dest(dest.css))
-		.pipe(notify("sass compiled, look at your styles"))
+		.pipe(notify("development scss reloaded"))
 		.pipe(browserSync.stream());
+	}
+
+	var makeMinifyCss = function() {
+		return gulp.src(src.sass + '*.scss')
+		.pipe(changed(dest.css))
+		.pipe(sass({
+			errLogToConsole: true,
+			includePaths: ['bower_components']
+		}))
+		.pipe(autoprefixer({
+			browsers: JSON.parse(process.env.AUTOPREFIXER_BROWSERS)
+		}))
+		.pipe(minifyCSS())
+		.pipe(gulp.dest(dest.css))
+		.pipe(notify("minified css created"))
+	}
+
+	var current_env = process.env.ENVIRONMENT;
+	return (current_env == 'dev') ? makeDevCss() : makeMinifyCss();
+
 });
 
 gulp.task('scripts', function() {
@@ -105,11 +131,10 @@ gulp.task('scripts', function() {
 
 gulp.task('browser-sync', function() {
 	browserSync.init({
-		host: "192.168.1.50",
-		xip: true,
+		host: process.env.HOST,
+		port: process.env.PORT,
 		server: {
-			baseDir: basePath.dest,
-			index: 'index.html'
+			baseDir: basePath.dest
 		}
 	});
 
