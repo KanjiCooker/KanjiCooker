@@ -79,9 +79,7 @@ gulp.task('html', function() {
 })
 
 gulp.task('sass', function() {
-
-	var makeDevCss = function() {
-		return gulp.src(src.sass + '*.scss')
+	return gulp.src(src.sass + '*.scss')
 		.pipe(plumber({ errorHandler: onError }))
 		.pipe(changed(dest.css))
 		.pipe(sourcemaps.init())
@@ -96,26 +94,6 @@ gulp.task('sass', function() {
 		.pipe(gulp.dest(dest.css))
 		.pipe(notify("development scss reloaded"))
 		.pipe(browserSync.stream());
-	}
-
-	var makeMinifyCss = function() {
-		return gulp.src(src.sass + '*.scss')
-		.pipe(changed(dest.css))
-		.pipe(sass({
-			errLogToConsole: true,
-			includePaths: ['bower_components']
-		}))
-		.pipe(autoprefixer({
-			browsers: JSON.parse(process.env.AUTOPREFIXER_BROWSERS)
-		}))
-		.pipe(minifyCSS())
-		.pipe(gulp.dest(dest.css))
-		.pipe(notify("minified css created"))
-	}
-
-	var current_env = process.env.ENVIRONMENT;
-	return (current_env == 'dev') ? makeDevCss() : makeMinifyCss();
-
 });
 
 gulp.task('scripts', function() {
