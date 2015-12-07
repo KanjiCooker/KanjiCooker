@@ -20,7 +20,6 @@ basePath =
 
 src =
 	fonts : "#{basePath.src}fonts/"
-	ie    : "#{basePath.src}ie8/"
 	img   : "#{basePath.src}img/"
 	js    : "#{basePath.src}js/"
 	pages : "#{basePath.src}pages/"
@@ -28,7 +27,6 @@ src =
 
 dest =
 	fonts : "#{basePath.dest}fonts/"
-	ie    : "#{basePath.dest}ie8/"
 	img   : "#{basePath.dest}img/"
 	js    : "#{basePath.dest}js/"
 	pages : basePath.dest
@@ -46,8 +44,8 @@ onError = (err) ->
 gulp.task 'clean', -> del(basePath.dest)
 
 gulp.task 'move', ->
-	['fonts', 'ie', 'img'].forEach (type) ->
-		gulp.src(src[type] + '**/*').pipe(gulp.dest(dest[type]))
+	['fonts', 'img'].forEach (type) ->
+		gulp.src("#{src[type]}**/*").pipe(gulp.dest(dest[type]))
 
 	return gulp.src("#{src.js}vendors/modernizr-2.6.2-respond-1.1.0.min.js").pipe(gulp.dest(dest.js))
 
@@ -97,7 +95,7 @@ gulp.task 'minify', ->
   gulp.src("#{dest.pages}*.html").pipe($.minifyHtml()).pipe(gulp.dest(dest.pages))
 
 ##################
-# Main task
+# Main tasks
 ##################
 
 gulp.task 'compile', ['move', 'html', 'sass', 'scripts']
