@@ -2,29 +2,17 @@
 # Requirements
 ##################
 
-gulp         = require('gulp')
-
-runSequence  = require('run-sequence')
-del          = require('del')
-env          = require('gulp-env')
-sass         = require('gulp-sass')
-autoprefixer = require('gulp-autoprefixer')
-coffeeify    = require('gulp-coffeeify')
-concat       = require('gulp-concat')
-sourcemaps   = require('gulp-sourcemaps')
-notify       = require('gulp-notify')
-plumber      = require('gulp-plumber')
-browserSync  = require('browser-sync')
-changed      = require('gulp-changed')
-minifyCSS    = require('gulp-minify-css')
-minifyHTML   = require('gulp-minify-html')
-uglify       = require('gulp-uglify')
+gulp        = require('gulp')
+runSequence = require('run-sequence')
+del         = require('del')
+browserSync = require('browser-sync')
+$           = require('gulp-load-plugins')()
 
 ##################
 # Config
 ##################
 
-env {file: '.env.json'}
+$.env {file: '.env.json'}
 
 basePath =
 	src: 'src/'
@@ -68,24 +56,24 @@ gulp.task 'html', ->
 
 gulp.task 'sass', ->
 	return gulp.src("#{src.sass}*.scss")
-		.pipe plumber({ errorHandler: onError })
-		.pipe changed(dest.css)
-		.pipe sourcemaps.init()
-		.pipe sass({
+		.pipe $.plumber({ errorHandler: onError })
+		.pipe $.changed(dest.css)
+		.pipe $.sourcemaps.init()
+		.pipe $.sass({
 			errLogToConsole: true
 			includePaths: ['bower_components']
 		})
-		.pipe autoprefixer({
+		.pipe $.autoprefixer({
 			browsers: JSON.parse(process.env.AUTOPREFIXER_BROWSERS)
 		})
-		.pipe sourcemaps.write()
+		.pipe $.sourcemaps.write()
 		.pipe gulp.dest(dest.css)
-		.pipe notify('development scss reloaded')
+		.pipe $.notify('development scss reloaded')
 		.pipe browserSync.stream()
 
 gulp.task 'scripts', ->
 	return gulp.src("#{src.js}main.coffee")
-    .pipe coffeeify({
+    .pipe $.coffeeify({
       options:
         debug: true
         paths: ["#{__dirname}/node_modules", "#{__dirname}/src/js"]
@@ -104,9 +92,9 @@ gulp.task 'browser-sync', ->
 	gulp.watch "#{src.pages}**/*.html", -> runSequence('html', reload)
 
 gulp.task 'minify', ->
-  gulp.src("#{dest.css}*.css").pipe(minifyCSS()).pipe(gulp.dest(dest.css))
-  gulp.src("#{dest.js}*.js").pipe(uglify()).pipe(gulp.dest(dest.js))
-  gulp.src("#{dest.pages}*.html").pipe(minifyHTML()).pipe(gulp.dest(dest.pages))
+  gulp.src("#{dest.css}*.css").pipe($.minifyCss()).pipe(gulp.dest(dest.css))
+  gulp.src("#{dest.js}*.js").pipe($.uglify()).pipe(gulp.dest(dest.js))
+  gulp.src("#{dest.pages}*.html").pipe($.minifyHtml()).pipe(gulp.dest(dest.pages))
 
 ##################
 # Main task
@@ -114,8 +102,6 @@ gulp.task 'minify', ->
 
 gulp.task 'compile', ['move', 'html', 'sass', 'scripts']
 
-gulp.task 'default', ->
-	runSequence('clean', 'compile', 'browser-sync')
+gulp.task 'default', -> runSequence('clean', 'compile', 'browser-sync')
 
-gulp.task 'build', ->
-	runSequence('clean', 'compile', 'minify')
+gulp.task 'build', -> runSequence('clean', 'compile', 'minify')
