@@ -6,6 +6,7 @@ var gulp         = require('gulp');
 
 var runSequence  = require('run-sequence');
 var del          = require('del');
+var env          = require('gulp-env');
 var sass         = require('gulp-sass');
 var autoprefixer = require('gulp-autoprefixer');
 var coffeeify    = require('gulp-coffeeify');
@@ -23,6 +24,10 @@ var uglify       = require('gulp-uglify');
 // -------------------------------------------------------------------------------------------------
 // Config
 // -------------------------------------------------------------------------------------------------
+
+env({
+	file: ".env.json"
+});
 
 var basePath = {
 	src: 'src/',
@@ -83,12 +88,11 @@ gulp.task('sass', function() {
 			includePaths: ['bower_components']
 		}))
 		.pipe(autoprefixer({
-			browsers: ['last 3 versions'],
-			cascade: false
+			browsers: JSON.parse(process.env.AUTOPREFIXER_BROWSERS)
 		}))
 		.pipe(sourcemaps.write())
 		.pipe(gulp.dest(dest.css))
-		.pipe(notify("sass compiled, look at your styles"))
+		.pipe(notify("development scss reloaded"))
 		.pipe(browserSync.stream());
 });
 
@@ -105,11 +109,10 @@ gulp.task('scripts', function() {
 
 gulp.task('browser-sync', function() {
 	browserSync.init({
-		host: "192.168.1.50",
-		xip: true,
+		host: process.env.HOST,
+		port: process.env.PORT,
 		server: {
-			baseDir: basePath.dest,
-			index: 'index.html'
+			baseDir: basePath.dest
 		}
 	});
 
